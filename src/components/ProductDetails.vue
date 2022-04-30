@@ -1,11 +1,9 @@
 <template>
 
-
 <div class="container">
 <h1> {{productDetails.name}} </h1>
 <h4> {{productDetails.directions}} </h4>
 <h4> {{productDetails.ingredients}} </h4>
-
 
 </div>
 </template>
@@ -18,20 +16,14 @@ name: 'ProductDetails',
 props:{  
          productDetails: Array
      },
+
      emits: ['delete-product'],  
  
-   
 methods: {
-    onDelete(id){
+        onDelete(id){
         this.$emit('delete-product',id)   
         }
 }
 
 })
 </script>
-
-
-
-<style scoped>
-
-</style>

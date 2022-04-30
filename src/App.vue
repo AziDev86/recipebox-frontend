@@ -1,20 +1,21 @@
 <template>
-<div class="container">
+  <div class="container">
 
-  <Header @toggle-add-product="toggleAddProduct"/>
-  <div v-show="showAddProduct">
+    <Header @toggle-add-product="toggleAddProduct"/>
+    <div v-show="showAddProduct">
       <AddProduct  @add-product="addProduct"/>
-  </div>
-  <Products  @edit-product="editProductDetails" @delete-product="deleteProduct" @select-product="selectProduct" :products="products" />
+    </div>
+
+    <Products  @edit-product="editProductDetails" @delete-product="deleteProduct" @select-product="selectProduct" :products="products" />
 
     <div v-show="showProductDetails">
-   <ProductDetails  :productDetails="productDetails"/> 
-   </div>
-       <div v-show="showProductUpdateForm">
+      <ProductDetails  :productDetails="productDetails"/> 
+    </div>
+
+    <div v-show="showProductUpdateForm">
       <EditProduct  @update-product="updateProduct" :productDetails="productDetails"/> 
     </div>
-</div>
-  
+  </div>
 </template>
 
 <script>
@@ -23,15 +24,9 @@ import  Products from './components/Products'
 import  AddProduct from './components/AddProduct'
 import  ProductDetails from './components/ProductDetails'
 import EditProduct from './components/EditProduct.vue'
-
+import Swal from 'sweetalert2'
 
 export default{
-
-      data(){
-      products:[]
-      
-
-    },
     name: 'App',
     components:{
       Header,
@@ -42,26 +37,39 @@ export default{
     },
   data(){
       return{
-            products:[],
-            productDetails:[],
-
-            showAddProduct: false,
-            showProductDetails: false,
-            showProductUpdateForm: false, 
-        } 
+              products:[],
+              productDetails:[],
+              showAddProduct: false,
+              showProductDetails: false,
+              showProductUpdateForm: false, 
+            } 
     },
     methods: {
-      toggleAddProduct(){
+        toggleAddProduct(){
         this.showAddProduct = !this.showAddProduct
       },
 
-      getData(){
+      getData(status){
 
-            this.axios.get('http://127.0.0.1:8000/api/products')
-            .then((result)=>{
-              console.warn(result)
-              this.products= result.data
-            })
+          let products_data = JSON.parse(localStorage.getItem('products_data'))
+
+          if (products_data && !status) {
+              // if products_data is not undefined (exists) in the local browser storage, load from local
+              this.products = products_data
+              }
+
+          else {
+                this.axios.get('http://127.0.0.1:8000/api/products')
+                .then((result)=>{
+                  this.products= result.data
+
+                  //store the retrived data in local storage
+                  localStorage.setItem('products_data', JSON.stringify(result.data));
+
+                })
+                .catch(error => console.log(error))
+                .finally(() => this.loading = false)
+              }
       },
 
       deleteProduct(id)
@@ -70,123 +78,173 @@ export default{
           {
               this.axios.delete("http://127.0.0.1:8000/api/products/"+id)
               .then((result)=>{
-                this.getData();
+                  var status =1;
+                  this.getData(status);
                   this.productDetails='';
                   this.showProductDetails = false;
 
-              })
+                  // giving user feedback
+                  Swal.fire({
+                    title: "Success!",
+                    text:   "Product has been deleted",
+                    icon: 'success', 
+                    });
+                  })
+              .catch(function (error) {
+              // giving user feedback
+              Swal.fire({
+                        title: "OPPS! could't delete product",
+                        text:   "Something went wrong, make sure you are connected to the internet",
+                        icon: 'warning',
+                    });
+            });
            }
           },
-      selectProduct(id)
-      {
 
-           this.axios.get("http://127.0.0.1:8000/api/products/"+id)
-           .then((result)=>{
-                      this.showProductDetails = true;
-                             this.showProductUpdateForm =false;
-           this.productDetails= result.data
+      selectProduct(id){
+        this.axios.get("http://127.0.0.1:8000/api/products/"+id)
+        .then((result)=>{
+              this.showProductDetails = true;
+              this.showProductUpdateForm =false;
+              this.productDetails= result.data
            })
-        
-          },
+        .catch(error => console.log(error))
+        .finally(() => this.loading = false)
 
-          editProductDetails(id)
-          {
-                          this.showProductDetails =false;
-                          this.showProductUpdateForm =true;
+        },
 
-           this.axios.get("http://127.0.0.1:8000/api/products/"+id)
-           .then((result)=>{
-           this.productDetails= result.data
-           })
+
+
+      editProductDetails(id){
+        this.showProductDetails =false;
+        this.showProductUpdateForm =true;
+
+        this.axios.get("http://127.0.0.1:8000/api/products/"+id)
+        .then((result)=>{
+        this.productDetails= result.data
+           })            
+           .catch(function (error) {
+            // giving user feedback
+              Swal.fire({
+                        title: "OPPS! could't load product",
+                        text:   "Something went wrong, make sure you are connected to the internet",
+                        icon: 'warning',
+                    });
+
+              console.log(error);
+            });
         
           },
           
-          updateProduct(product)
-          {
-           this.axios.put("http://127.0.0.1:8000/api/products/"+product.id,
-              {
-                name: product.name,
-                directions: product.directions,
-                ingredients: product.ingredients
-              })
-              .then((result)=>{
-                this.getData();
+      updateProduct(product){
+        this.axios.put("http://127.0.0.1:8000/api/products/"+product.id,{
+          name: product.name,
+          directions: product.directions,
+          ingredients: product.ingredients
+        })
+              
+        .then((result)=>{
+          var status =1;
+          this.getData(status);
+          // giving user feedback
+          Swal.fire({
+                      title: "Success!",
+                      text:   "Product has been updated",
+                      icon: 'success',
+                      
+                    });
               })
             .catch(function (error) {
-              console.log(error);
+              Swal.fire({
+                        title: "OPPS! could't update product",
+                        text:   "Something went wrong, make sure you are connected to the internet",
+                        icon: 'warning',
+                      
+                    });
+
             });
-                          this.showProductUpdateForm =false;
-                          this.showProductDetails =false;
+                        this.showProductUpdateForm =false;
+                        this.showProductDetails =false;
 
               },
-        addProduct(product)
-        {
-              this.axios.post('http://127.0.0.1:8000/api/products', {
-              name: product.name,
-              directions: product.directions,
-              ingredients: product.ingredients
-            })
-              .then((result)=>{
-                this.getData();
-              })
-            .catch(function (error) {
-              console.log(error);
+        addProduct(product){
+            this.axios.post('http://127.0.0.1:8000/api/products', {
+            name: product.name,
+            directions: product.directions,
+            ingredients: product.ingredients
+            })           
+            .then((result)=>{
+              var status =1;
+              this.getData(status);
+
+                  Swal.fire({
+                  title: "Success!",
+                  text:   "Product has been added",
+                  icon: 'success',
+                
+                   });
+    
+
+              }).catch(function (error) {
+                    Swal.fire({
+                        title: "OPPS! could't add product",
+                        text:   "Something went wrong, make sure you are connected to the internet",
+                        icon: 'warning',
+                      
+                    });
             });
+
         }
     },
 
-   
      mounted() {
-       this.getData()
-
+      this.getData()
 
      }
-
 }
 
 </script>
 
-
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap');
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-body {
-  font-family: 'Poppins', sans-serif;
-}
-.container {
-  max-width: 800px;
-  margin: 30px auto;
-  overflow: auto;
-  min-height: 300px;
-  border: 1px solid steelblue;
-  padding: 30px;
-  border-radius: 5px;
-}
-.btn {
-  display: inline-block;
-  background: #000;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  margin: 5px;
-  border-radius: 5px;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 15px;
-  font-family: inherit;
-}
-.btn:focus {
-  outline: none;
-}
-.btn:active {
-  transform: scale(0.98);
-}
-.btn-block {
-  display: block;
-  width: 100%;
-}
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap');
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+  .container {
+    max-width: 800px;
+    margin: 30px auto;
+    overflow: auto;
+    min-height: 300px;
+    border: 1px solid steelblue;
+    padding: 30px;
+    border-radius: 5px;
+  }
+  .btn {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .btn:focus {
+    outline: none;
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+  .btn-block {
+    display: block;
+    width: 100%;
+  }
 </style>
