@@ -50,7 +50,7 @@ export default{
       },
 
       getData(status){
-          window.alert(process.env.VUE_APP_BACKEND_URL)
+         //process.env.VUE_APP_BACKEND_URL
           let products_data = JSON.parse(localStorage.getItem('products_data'))
 
           if (products_data && !status) {
@@ -60,7 +60,7 @@ export default{
 
           else {
           
-                this.axios.get(process.env.VUE_APP_BACKEND_URL)
+                this.axios.get('https://recipe-box-wx8wd.ondigitalocean.app/api/products/')
                 .then((result)=>{
                   this.products= result.data
 
@@ -77,7 +77,7 @@ export default{
       {
           if(confirm("Are you sure you want to delete this product"))
           {
-              this.axios.delete(process.env.VUE_APP_BACKEND_URL+id)
+              this.axios.delete('https://recipe-box-wx8wd.ondigitalocean.app/api/products/'+id)
               .then((result)=>{
                   var status =1;
                   this.getData(status);
@@ -103,7 +103,7 @@ export default{
           },
 
       selectProduct(id){
-        this.axios.get(process.env.VUE_APP_BACKEND_URL+id)
+        this.axios.get('https://recipe-box-wx8wd.ondigitalocean.app/api/products/'+id)
         .then((result)=>{
               this.showProductDetails = true;
               this.showProductUpdateForm =false;
@@ -138,7 +138,7 @@ export default{
           },
           
       updateProduct(product){
-        this.axios.put(process.env.VUE_APP_BACKEND_URL+product.id,{
+        this.axios.put('https://recipe-box-wx8wd.ondigitalocean.app/api/products/'+product.id,{
           name: product.name,
           directions: product.directions,
           ingredients: product.ingredients
@@ -169,7 +169,7 @@ export default{
 
               },
         addProduct(product){
-            this.axios.post(process.env.VUE_APP_BACKEND_URL, {
+            this.axios.post('https://recipe-box-wx8wd.ondigitalocean.app/api/products/', {
             name: product.name,
             directions: product.directions,
             ingredients: product.ingredients
