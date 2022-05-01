@@ -90,5 +90,6 @@ export default {
     padding: 3px 7px;
     font-size: 17px;
     max-width: 100%;
+    min-height: 100px;
   }
 </style>
