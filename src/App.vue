@@ -50,7 +50,6 @@ export default{
       },
 
       getData(status){
-
           let products_data = JSON.parse(localStorage.getItem('products_data'))
 
           if (products_data && !status) {
@@ -59,7 +58,7 @@ export default{
               }
 
           else {
-                this.axios.get('http://127.0.0.1:8000/api/products')
+                this.axios.get(process.env.VUE_APP_BACKEND_URL)
                 .then((result)=>{
                   this.products= result.data
 
@@ -76,7 +75,7 @@ export default{
       {
           if(confirm("Are you sure you want to delete this product"))
           {
-              this.axios.delete("http://127.0.0.1:8000/api/products/"+id)
+              this.axios.delete(process.env.VUE_APP_BACKEND_URL+id)
               .then((result)=>{
                   var status =1;
                   this.getData(status);
@@ -102,7 +101,7 @@ export default{
           },
 
       selectProduct(id){
-        this.axios.get("http://127.0.0.1:8000/api/products/"+id)
+        this.axios.get(process.env.VUE_APP_BACKEND_URL+id)
         .then((result)=>{
               this.showProductDetails = true;
               this.showProductUpdateForm =false;
@@ -119,7 +118,7 @@ export default{
         this.showProductDetails =false;
         this.showProductUpdateForm =true;
 
-        this.axios.get("http://127.0.0.1:8000/api/products/"+id)
+        this.axios.get(process.env.VUE_APP_BACKEND_URL+id)
         .then((result)=>{
         this.productDetails= result.data
            })            
@@ -137,7 +136,7 @@ export default{
           },
           
       updateProduct(product){
-        this.axios.put("http://127.0.0.1:8000/api/products/"+product.id,{
+        this.axios.put(process.env.VUE_APP_BACKEND_URL+product.id,{
           name: product.name,
           directions: product.directions,
           ingredients: product.ingredients
@@ -168,7 +167,7 @@ export default{
 
               },
         addProduct(product){
-            this.axios.post('http://127.0.0.1:8000/api/products', {
+            this.axios.post(process.env.VUE_APP_BACKEND_URL, {
             name: product.name,
             directions: product.directions,
             ingredients: product.ingredients
