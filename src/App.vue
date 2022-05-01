@@ -50,6 +50,7 @@ export default{
       },
 
       getData(status){
+          window.alert(process.env.VUE_APP_BACKEND_URL)
           let products_data = JSON.parse(localStorage.getItem('products_data'))
 
           if (products_data && !status) {
@@ -58,6 +59,7 @@ export default{
               }
 
           else {
+          
                 this.axios.get(process.env.VUE_APP_BACKEND_URL)
                 .then((result)=>{
                   this.products= result.data
