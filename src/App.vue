@@ -50,6 +50,7 @@ export default{
       },
 
       getData(status){
+        // this will be used when the app is production by using server environment variables
          //process.env.VUE_APP_BACKEND_URL
           let products_data = JSON.parse(localStorage.getItem('products_data'))
 
@@ -120,7 +121,7 @@ export default{
         this.showProductDetails =false;
         this.showProductUpdateForm =true;
 
-        this.axios.get(process.env.VUE_APP_BACKEND_URL+id)
+        this.axios.get('https://recipe-box-wx8wd.ondigitalocean.app/api/products/'+id)
         .then((result)=>{
         this.productDetails= result.data
            })            

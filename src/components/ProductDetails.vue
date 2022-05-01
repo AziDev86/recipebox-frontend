@@ -2,8 +2,10 @@
 
 <div class="container">
 <h1> {{productDetails.name}} </h1>
-<h4> {{productDetails.directions}} </h4>
-<h4> {{productDetails.ingredients}} </h4>
+<br>
+ {{productDetails.directions}} 
+<br>
+ {{productDetails.ingredients}} 
 
 </div>
 </template>
