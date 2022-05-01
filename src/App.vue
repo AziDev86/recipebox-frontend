@@ -60,7 +60,7 @@ export default{
 
           else {
           
-                this.axios.get('https://recipe-box-wx8wd.ondigitalocean.app/api/products/')
+                this.axios.get('https://recipe-box-wx8wd.ondigitalocean.app/api/products')
                 .then((result)=>{
                   this.products= result.data
 
@@ -169,7 +169,7 @@ export default{
 
               },
         addProduct(product){
-            this.axios.post('https://recipe-box-wx8wd.ondigitalocean.app/api/products/', {
+            this.axios.post('https://recipe-box-wx8wd.ondigitalocean.app/api/products', {
             name: product.name,
             directions: product.directions,
             ingredients: product.ingredients
